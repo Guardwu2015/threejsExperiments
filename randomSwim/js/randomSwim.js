@@ -1,3 +1,4 @@
+
 var vertices = [];
 var camPos = new THREE.Vector3(0,0,0);
 
