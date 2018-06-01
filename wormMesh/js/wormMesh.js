@@ -7,9 +7,6 @@ camera.position.set( 0, 0, 100 );
 camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 var scene = new THREE.Scene();
 
-var ambientLight = new THREE.AmbientLight(0xffffff);
-//scene.add(ambientLight);
-
 var spotLight = new THREE.SpotLight(0xffffff);
 spotLight.position.set(-30, 60, 60);
 spotLight.castShadow = true;
@@ -17,7 +14,6 @@ scene.add(spotLight);
 
 var targetObject = new THREE.Object3D();
 targetObject.position.set(new THREE.Vector3(0,0,0));
-
 spotLight.target = targetObject;
 scene.add(spotLight.target);
 
@@ -32,12 +28,12 @@ class Part{
 
   constructor(){
     //backbone
-
     this.bbdir = new THREE.Vector3(Math.random(), Math.random(), Math.random());
     this.newDir = this.bbdir.clone();
     this.bblastPos = new THREE.Vector3(0, 0, 0);
     this.bbgeometry = new THREE.Geometry();
-    /**/
+
+
     this.bbmaterial = new THREE.LineBasicMaterial( { color: 0x0000ff} );
     this.bbline = new THREE.Line( this.bbgeometry, this.bbmaterial );;
 
@@ -51,11 +47,6 @@ class Part{
       this.bbgeometry.vertices.push(new THREE.Vector3( tempNewDir.x, tempNewDir.y, tempNewDir.z));
     }
 
-    //for debug
-    /*
-    this.bbline = new THREE.Line( this.bbgeometry, this.bbmaterial );
-    scene.add( this.bbline );
-    */
 
     //mesh
     this.geometry = new THREE.Geometry();
@@ -181,31 +172,23 @@ update (){
     if(i == 0){
 
       var tempDir = this.bbdir.clone();
-      var tempDir2 = this.bbdir.clone();//new THREE.Vector3(tempDir.x,tempDir.y,tempDir.z);
+      var tempDir2 = this.bbdir.clone();
 
 
       if(Math.random()<.1){
-        //this.newDir.normalize().copy(tempDir.applyAxisAngle(new THREE.Vector3((Math.random()-.5)*2., (Math.random()-5)*2.,(Math.random()-5)*2.), (Math.random()-.5)*360));
         this.newDir = new THREE.Vector3((Math.random()-.5)*2.,
         (Math.random()-.5)*2.,
         (Math.random()-.5)*2.);
-        console.log(this.newDir);
       }
 
-
-
       var tempNewDir = this.newDir.clone();
-
 
 
       tempDir2.x += ((tempNewDir.x-tempDir.x)*.05);
       tempDir2.y += ((tempNewDir.y-tempDir.y)*.05);
       tempDir2.z += ((tempNewDir.z-tempDir.z)*.05);
 
-      //
-
       this.bbline.geometry.vertices[0].add( tempDir2.normalize().multiplyScalar(mag));
-
       this.bbdir.copy(tempDir2);
 
     }
@@ -267,34 +250,25 @@ update (){
           var cc = this.rectsH*.5;
           var dd1 = Math.abs((i) -  cc);
           var dd2 = Math.abs((i+1) -  cc);
-          //var env = ((cc-Math.abs(i -  this.rectsH*.5))/this.rectsH*.5)*4.;
           var env1 = (cc-dd1)*.06;
           var env2 = (cc-dd2)*.06;
 
           d1*=.1 ;
           d2*=.1 ;
-
           dh1*=.5 ;
           dh2*=.5 ;
 
-
-
           var rot1 = perp.clone().applyAxisAngle(dir, ang1).multiplyScalar( (d1* env1+dh1* env1));
           var rot2 = perp2.clone().applyAxisAngle(dir2, ang1).multiplyScalar( (d2* env2+dh1* env2));
-
-
           var rot3 = perp.clone().applyAxisAngle(dir, ang2).normalize().multiplyScalar( (d1* env1+dh2* env1));
           var rot4 = perp2.clone().applyAxisAngle(dir2, ang2).normalize().multiplyScalar((d2* env2+dh2* env2));
 
           var o1 = new THREE.Vector3(0,0,0);
           var o2 = new THREE.Vector3(0,0,0);
 
-
           if(i<this.rectsH-1){
-
             o1.copy(this.bbline.geometry.vertices[i]);
             o2.copy(this.bbline.geometry.vertices[i+1]);
-
           }else {
             o1.copy(this.bbline.geometry.vertices[i]);
             o2.copy(this.bbline.geometry.vertices[i]);
@@ -313,15 +287,12 @@ update (){
           var pv3 = this.mesh.geometry.vertices[(j*this.rectsH*4) + i*4+3].clone();
           var pv4 = this.mesh.geometry.vertices[(j*this.rectsH*4) + i*4+2].clone();
 
-
-
           this.mesh.geometry.vertices[(j*this.rectsH*4) + i*4].copy(v1);
           this.mesh.geometry.vertices[(j*this.rectsH*4) + i*4+1].copy(v2);
           this.mesh.geometry.vertices[(j*this.rectsH*4) + i*4+3].copy(v3);
           this.mesh.geometry.vertices[(j*this.rectsH*4) + i*4+2].copy(v4);
 
         }
-
 
       }
 
@@ -366,17 +337,11 @@ update (){
       scene.add(this.starField );
 
     }
-    update(){
-
-
-    }
 
 
   }
 
-
   var meshes = [];
-
 
   var nMesh = 1;
   for(var i=0; i<nMesh; i++){
@@ -386,28 +351,23 @@ update (){
   bkg = new BkgPart();
 
 
-
   renderer.render( scene, camera );
 
 
   function animate() {
 
-
-
     for(var i=0; i<meshes.length; i++){
       meshes[i].update();
     }
 
-
-
-
-
     var tempPos = meshes[0].mesh.position.clone();
 
+    //camera follow
     camPos.add((tempPos.sub(camPos)).multiplyScalar(.075));
     camera.position.set(camPos.x, camPos.y, camPos.z+20);
     camera.lookAt( camPos );
 
+    //Spotlight follow
     spotLight.position.set(camPos.x-30, camPos.y+60, camPos.z+60);
     targetObject.position.set(camPos.x, camPos.y, camPos.z);
 
