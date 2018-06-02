@@ -24,7 +24,7 @@ var mag = .5;
 var camPos = new THREE.Vector3(0,0,0);
 
 //the worm!
-class Part{
+class Worm{
 
   constructor(){
     //backbone
@@ -153,7 +153,6 @@ class Part{
   this.geometry.computeFaceNormals();
   this.geometry.computeVertexNormals();
 
-//  this.material =  new THREE.MeshLambertMaterial({color: 0x353335});
   this.material =  new THREE.MeshLambertMaterial({color: 0xdddddd});
 
   this.material.side = THREE.DoubleSide;
@@ -317,7 +316,7 @@ update (){
   class BkgPart{
 
     constructor(){
-
+      
       this.starsGeometry = new THREE.Geometry();
 
       for ( var i = 0; i < 100000; i ++ ) {
@@ -345,7 +344,7 @@ update (){
 
   var nMesh = 1;
   for(var i=0; i<nMesh; i++){
-    meshes.push(new Part());
+    meshes.push(new Worm());
   }
 
   bkg = new BkgPart();
