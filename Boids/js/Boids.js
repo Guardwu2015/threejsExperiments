@@ -37,34 +37,20 @@ function setup() {
 
 
   flock = new Flock();
-  // Add an initial set of boids into the system
+
   for (var i = 0; i < nBoids; i++) {
     var b = new Boid(0,0,0);
     flock.addBoid(b);
   }
 }
 
-/*
-function draw() {
-background(51);
-flock.run();
-}
-*/
-// Add a new boid into the System
+
 function mouseDragged() {
   flock.addBoid(new Boid(mouseX,mouseY));
 }
 
-// The Nature of Code
-// Daniel Shiffman
-// http://natureofcode.com
-
-// Flock object
-// Does very little, simply manages the array of all the boids
-
 function Flock() {
-  // An array for all the boids
-  this.boids = []; // Initialize the array
+  this.boids = [];
 }
 
 Flock.prototype.run = function() {
@@ -76,6 +62,8 @@ Flock.prototype.run = function() {
 Flock.prototype.addBoid = function(b) {
   this.boids.push(b);
 }
+
+
 
 // The Nature of Code
 // Daniel Shiffman
@@ -557,7 +545,7 @@ Boid.prototype.update = function() {
 
       flock.run();
 
-    
+
   var tempPos = flock.boids[0].mesh.position.clone();
 
     //camera follow
