@@ -47,8 +47,11 @@ function setup() {
 
 
 class Flock {
+
+
   constructor(){
     this.boids = [];
+
   }
   run() {
     for (var i = 0; i < this.boids.length; i++) {
@@ -496,6 +499,7 @@ update () {
 
   }
 
+
 class BkgPart{
 
   constructor(){
@@ -534,11 +538,26 @@ function animate() {
 
   flock.run();
 
+  //follow the center of the flocking
 
-  var tempPos = flock.boids[0].mesh.position.clone();
+  var tempCentralPos = new THREE.Vector3(0,0,0);
+
+
+  for(var i = 0; i<flock.boids.length; i++){
+    tempCentralPos.add(flock.boids[i].mesh.position);
+
+  }
+
+
+
+  tempCentralPos.divideScalar(flock.boids.length);
+
+
+  //var tempPos = flock.boids[0].mesh.position.clone();
+  var tempPos = tempCentralPos.clone();
 
   //camera follow
-  camPos.add((tempPos.sub(camPos)).multiplyScalar(.5));
+  camPos.add((tempPos.sub(camPos)).multiplyScalar(.3));
   camera.position.set(camPos.x, camPos.y, camPos.z+60);
   camera.lookAt( camPos );
 
