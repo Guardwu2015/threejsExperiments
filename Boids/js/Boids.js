@@ -1,5 +1,5 @@
-// not working well
-//flocking from p5js flocking example.
+// not working so well
+//flocking from p5js flocking example, https://p5js.org/examples/simulate-flocking.html
 
 //init scene
 var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -45,22 +45,22 @@ function setup() {
 }
 
 
-function mouseDragged() {
-  flock.addBoid(new Boid(mouseX,mouseY));
-}
 
-function Flock() {
-  this.boids = [];
-}
-
-Flock.prototype.run = function() {
-  for (var i = 0; i < this.boids.length; i++) {
-    this.boids[i].run(this.boids);  // Passing the entire list of boids to each boid individually
+class Flock {
+  constructor(){
+    this.boids = [];
   }
-}
+  run() {
+    for (var i = 0; i < this.boids.length; i++) {
+      this.boids[i].run(this.boids);  // Passing the entire list of boids to each boid individually
+    }
+  }
 
-Flock.prototype.addBoid = function(b) {
-  this.boids.push(b);
+  addBoid(b) {
+    this.boids.push(b);
+  }
+
+
 }
 
 
@@ -72,164 +72,163 @@ Flock.prototype.addBoid = function(b) {
 // Boid class
 // Methods for Separation, Cohesion, Alignment added
 
-function Boid(x,y,z) {
-  this.acceleration = new THREE.Vector3(0,0,0);
-  this.velocity = new THREE.Vector3(Math.random(),Math.random(),Math.random());
-  this.position = new THREE.Vector3(x,y,z);
-  this.r = 3.0;
-  this.maxspeed = 3;    // Maximum speed
-  this.maxforce = Math.random()*0.2+.05; // Maximum steering force
+class Boid {
+
+  constructor(x,y,z){
+    this.acceleration = new THREE.Vector3(0,0,0);
+    this.velocity = new THREE.Vector3(Math.random(),Math.random(),Math.random());
+    this.position = new THREE.Vector3(x,y,z);
+    this.r = 3.0;
+    this.maxspeed = 3;    // Maximum speed
+    this.maxforce = Math.random()*0.2+.05; // Maximum steering force
 
 
-  this.bbdir = new THREE.Vector3(Math.random(), Math.random(), Math.random());
-  this.newDir = this.bbdir.clone();
-  this.bblastPos = new THREE.Vector3(0, 0, 0);
-  this.bbgeometry = new THREE.Geometry();
+    this.bbdir = new THREE.Vector3(Math.random(), Math.random(), Math.random());
+    this.newDir = this.bbdir.clone();
+    this.bblastPos = new THREE.Vector3(0, 0, 0);
+    this.bbgeometry = new THREE.Geometry();
 
 
-  this.bbmaterial = new THREE.LineBasicMaterial( { color: 0x0000ff} );
-  this.bbline = new THREE.Line( this.bbgeometry, this.bbmaterial );;
+    this.bbmaterial = new THREE.LineBasicMaterial( { color: 0x0000ff} );
+    this.bbline = new THREE.Line( this.bbgeometry, this.bbmaterial );;
 
-  for(var i=0; i<vertNum; i++){
+    for(var i=0; i<vertNum; i++){
 
-    var tempDir = this.bbdir;
-    var dirNorm = tempDir.normalize();
-    var dirScaled = dirNorm.multiplyScalar(mag);
-    var tempNewDir= this.bblastPos.add(dirScaled);
+      var tempDir = this.bbdir;
+      var dirNorm = tempDir.normalize();
+      var dirScaled = dirNorm.multiplyScalar(mag);
+      var tempNewDir= this.bblastPos.add(dirScaled);
 
-    this.bbgeometry.vertices.push(new THREE.Vector3( tempNewDir.x, tempNewDir.y, tempNewDir.z));
-  }
+      this.bbgeometry.vertices.push(new THREE.Vector3( tempNewDir.x, tempNewDir.y, tempNewDir.z));
+    }
 
 
-  //mesh
-  this.geometry = new THREE.Geometry();
-  this.rectsH = vertNum;
-  this.rectsV =15;
-  var dx = 5;
-  var dy= 5;
-  var angvar = 2*3.14 / (this.rectsV-1) ;
+    //mesh
+    this.geometry = new THREE.Geometry();
+    this.rectsH = vertNum;
+    this.rectsV =15;
+    var dx = 5;
+    var dy= 5;
+    var angvar = 2*3.14 / (this.rectsV-1) ;
 
-  this.LineMat= new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    this.LineMat= new THREE.LineBasicMaterial( { color: 0x0000ff } );
 
-  for(var i = 0; i< this.rectsH; i++){
-    for(var j=0;j < this.rectsV; j++){
+    for(var i = 0; i< this.rectsH; i++){
+      for(var j=0;j < this.rectsV; j++){
 
-      var newDirec = new THREE.Vector3(0,0,0);
-      var newDirec2 = new THREE.Vector3(0,0,0);
-      var tempVec1 = new THREE.Vector3(0,0,0);
-      var tempVec2 = new THREE.Vector3(0,0,0);
-      if(i==0){
-        newDirec.copy(this.bbdir);
-        newDirec2 = tempVec2.copy(this.bbline.geometry.vertices[i+1]).sub(this.bbline.geometry.vertices[i]).normalize();
-      }
-      else{
-
-        if(i<this.rectsH-1){
-          newDirec = tempVec1.copy(this.bbline.geometry.vertices[i]).sub(this.bbline.geometry.vertices[i-1]).normalize();
+        var newDirec = new THREE.Vector3(0,0,0);
+        var newDirec2 = new THREE.Vector3(0,0,0);
+        var tempVec1 = new THREE.Vector3(0,0,0);
+        var tempVec2 = new THREE.Vector3(0,0,0);
+        if(i==0){
+          newDirec.copy(this.bbdir);
           newDirec2 = tempVec2.copy(this.bbline.geometry.vertices[i+1]).sub(this.bbline.geometry.vertices[i]).normalize();
+        }
+        else{
+
+          if(i<this.rectsH-1){
+            newDirec = tempVec1.copy(this.bbline.geometry.vertices[i]).sub(this.bbline.geometry.vertices[i-1]).normalize();
+            newDirec2 = tempVec2.copy(this.bbline.geometry.vertices[i+1]).sub(this.bbline.geometry.vertices[i]).normalize();
+
+          }
 
         }
+        //newDirec.normalize();
 
+        var dir = new THREE.Vector3(newDirec.x, newDirec.y, newDirec.z);
+        var perp = new THREE.Vector3(newDirec.x,newDirec.y,newDirec.z);
+
+        var dir2 = new THREE.Vector3(newDirec2.x, newDirec2.y, newDirec2.z);
+        var perp2 = new THREE.Vector3(newDirec2.x,newDirec2.y,newDirec2.z);
+
+        perp.cross(new THREE.Vector3(0,1,0)).normalize();
+        perp2.cross(new THREE.Vector3(0,1,0)).normalize();
+
+        var ang1 = angvar * j;
+        var ang2 = angvar * (j+1);
+
+        var d1 = (Math.sin(i)*0.5+0.5)*5+5;
+        var d2 = (Math.sin(i+1)*0.5+0.5)*5+5;
+        var dh1 = 0;//Math.sin(angvar*(j)*10.)*1;
+        var dh2 = 0;//Math.sin(angvar*(j+1)*10.)*1;
+
+        var rot1 = perp.clone().applyAxisAngle(dir, ang1).multiplyScalar(d1+dh1);
+        var rot2 = perp2.clone().applyAxisAngle(dir2, ang1).multiplyScalar(d2+dh1);
+
+        var rot3 = perp.clone().applyAxisAngle(dir, ang2).multiplyScalar(d1+dh2);
+        var rot4 = perp2.clone().applyAxisAngle(dir2, ang2).multiplyScalar(d2+dh2);
+
+        var lineGeometry = new THREE.Geometry();
+
+        var o1 = new THREE.Vector3(0,0,0);
+        var o2 = new THREE.Vector3(0,0,0);
+
+        if(i<this.rectsH-1){
+
+          o1.copy(this.bbline.geometry.vertices[i]);
+          o2.copy(this.bbline.geometry.vertices[i+1]);
+
+        }else {
+          o1.copy(this.bbline.geometry.vertices[i]);
+          o2.copy(this.bbline.geometry.vertices[i]);
+        }
+
+
+        var v1 = new THREE.Vector3(rot1.x, rot1.y ,rot1.z ).add(o1);
+        var v2 = new THREE.Vector3(rot2.x, rot2.y ,rot2.z ).add(o2);
+        var v3 = new THREE.Vector3(rot3.x, rot3.y ,rot3.z ).add(o1);
+        var v4 = new THREE.Vector3(rot4.x, rot4.y ,rot4.z ).add(o2);
+
+
+        //for debug
+        /*
+        lineGeometry.vertices.push(o1);
+        lineGeometry.vertices.push(v1);
+
+        if(i!=this.rectsH-1){
+        var line = new THREE.Line( lineGeometry, this.lineMat);
+        scene.add( line );
       }
-      //newDirec.normalize();
+      */
+      this.geometry.vertices.push( v3 );
+      this.geometry.vertices.push( v4 );
+      this.geometry.vertices.push( v2 );
+      this.geometry.vertices.push( v1 );
 
-      var dir = new THREE.Vector3(newDirec.x, newDirec.y, newDirec.z);
-      var perp = new THREE.Vector3(newDirec.x,newDirec.y,newDirec.z);
-
-      var dir2 = new THREE.Vector3(newDirec2.x, newDirec2.y, newDirec2.z);
-      var perp2 = new THREE.Vector3(newDirec2.x,newDirec2.y,newDirec2.z);
-
-      perp.cross(new THREE.Vector3(0,1,0)).normalize();
-      perp2.cross(new THREE.Vector3(0,1,0)).normalize();
-
-      var ang1 = angvar * j;
-      var ang2 = angvar * (j+1);
-
-      var d1 = (Math.sin(i)*0.5+0.5)*5+5;
-      var d2 = (Math.sin(i+1)*0.5+0.5)*5+5;
-      var dh1 = 0;//Math.sin(angvar*(j)*10.)*1;
-      var dh2 = 0;//Math.sin(angvar*(j+1)*10.)*1;
-
-      var rot1 = perp.clone().applyAxisAngle(dir, ang1).multiplyScalar(d1+dh1);
-      var rot2 = perp2.clone().applyAxisAngle(dir2, ang1).multiplyScalar(d2+dh1);
-
-      var rot3 = perp.clone().applyAxisAngle(dir, ang2).multiplyScalar(d1+dh2);
-      var rot4 = perp2.clone().applyAxisAngle(dir2, ang2).multiplyScalar(d2+dh2);
-
-      var lineGeometry = new THREE.Geometry();
-
-      var o1 = new THREE.Vector3(0,0,0);
-      var o2 = new THREE.Vector3(0,0,0);
-
-      if(i<this.rectsH-1){
-
-        o1.copy(this.bbline.geometry.vertices[i]);
-        o2.copy(this.bbline.geometry.vertices[i+1]);
-
-      }else {
-        o1.copy(this.bbline.geometry.vertices[i]);
-        o2.copy(this.bbline.geometry.vertices[i]);
+      if(i>0){
+        this.geometry.faces.push( new THREE.Face3( (j*this.rectsH*4) + i*4,
+        (j*this.rectsH*4) + i*4+1,
+        (j*this.rectsH*4) + i*4+2 ) ); // counter-clockwise winding order
+        this.geometry.faces.push( new THREE.Face3( (j*this.rectsH*4) + i*4,
+        (j*this.rectsH*4) + i*4+2,
+        (j*this.rectsH*4) + i*4+3 ) );
       }
-
-
-      var v1 = new THREE.Vector3(rot1.x, rot1.y ,rot1.z ).add(o1);
-      var v2 = new THREE.Vector3(rot2.x, rot2.y ,rot2.z ).add(o2);
-      var v3 = new THREE.Vector3(rot3.x, rot3.y ,rot3.z ).add(o1);
-      var v4 = new THREE.Vector3(rot4.x, rot4.y ,rot4.z ).add(o2);
-
-
-      //for debug
-      /*
-      lineGeometry.vertices.push(o1);
-      lineGeometry.vertices.push(v1);
-
-      if(i!=this.rectsH-1){
-      var line = new THREE.Line( lineGeometry, this.lineMat);
-      scene.add( line );
-    }
-    */
-    this.geometry.vertices.push( v3 );
-    this.geometry.vertices.push( v4 );
-    this.geometry.vertices.push( v2 );
-    this.geometry.vertices.push( v1 );
-
-    if(i>0){
-      this.geometry.faces.push( new THREE.Face3( (j*this.rectsH*4) + i*4,
-      (j*this.rectsH*4) + i*4+1,
-      (j*this.rectsH*4) + i*4+2 ) ); // counter-clockwise winding order
-      this.geometry.faces.push( new THREE.Face3( (j*this.rectsH*4) + i*4,
-      (j*this.rectsH*4) + i*4+2,
-      (j*this.rectsH*4) + i*4+3 ) );
     }
   }
+  this.geometry.computeFaceNormals();
+  this.geometry.computeVertexNormals();
+
+  this.material =  new THREE.MeshLambertMaterial({color: 0xdddddd});
+
+  this.material.side = THREE.DoubleSide;
+  this.mesh = new THREE.Mesh( this.geometry, this.material );
+  scene.add( this.mesh );
+
+
+  console.log('mesh created');
+  //console.log("cube created");
 }
-this.geometry.computeFaceNormals();
-this.geometry.computeVertexNormals();
 
-this.material =  new THREE.MeshLambertMaterial({color: 0xdddddd});
-
-this.material.side = THREE.DoubleSide;
-this.mesh = new THREE.Mesh( this.geometry, this.material );
-scene.add( this.mesh );
-
-
-console.log('mesh created');
-//console.log("cube created");
-}
-
-Boid.prototype.run = function(boids) {
+run (boids) {
   this.flock(boids);
   this.update();
 
 }
-
-Boid.prototype.applyForce = function(force) {
+applyForce(force) {
   // We could add mass here if we want A = F / M
   this.acceleration.add(force);
 }
-
-// We accumulate a new acceleration each time based on three rules
-Boid.prototype.flock = function(boids) {
+flock (boids) {
   var sep = this.separate(boids);   // Separation
   var ali = this.align(boids);      // Alignment
   var coh = this.cohesion(boids);   // Cohesion
@@ -243,8 +242,7 @@ Boid.prototype.flock = function(boids) {
   this.applyForce(coh);
 }
 
-// Method to update location
-Boid.prototype.update = function() {
+update () {
   // Update velocity
   this.velocity.add(this.acceleration);
   // Limit speed
@@ -405,14 +403,7 @@ Boid.prototype.update = function() {
       this.mesh.visible = true;
     }
 
-
-
-
-
-
-    // A method that calculates and applies a steering force towards a target
-    // STEER = DESIRED MINUS VELOCITY
-    Boid.prototype.seek = function(target) {
+    seek (target) {
       var desired = target.clone().sub(this.position);  // A vector pointing from the location to the target
       // Normalize desired and scale to maximum speed
       desired.normalize();
@@ -423,11 +414,7 @@ Boid.prototype.update = function() {
       return steer;
     }
 
-
-
-    // Separation
-    // Method checks for nearby boids and steers away
-    Boid.prototype.separate = function(boids) {
+    separate(boids) {
       var desiredseparation = 20.0;
       var steer = new THREE.Vector3(0,0,0);
       var count = 0;
@@ -462,7 +449,7 @@ Boid.prototype.update = function() {
 
     // Alignment
     // For every nearby boid in the system, calculate the average velocity
-    Boid.prototype.align = function(boids) {
+    align (boids) {
       var neighbordist = 150;
       var sum = new THREE.Vector3(0,0,0);
       var count = 0;
@@ -488,7 +475,7 @@ Boid.prototype.update = function() {
 
     // Cohesion
     // For the average location (i.e. center) of all nearby boids, calculate steering vector towards that location
-    Boid.prototype.cohesion = function(boids) {
+    cohesion (boids) {
       var neighbordist = 150;
       var sum = new THREE.Vector3(0,0,0);   // Start with empty vector to accumulate all locations
       var count = 0;
@@ -507,62 +494,64 @@ Boid.prototype.update = function() {
       }
     }
 
-    class BkgPart{
+  }
 
-      constructor(){
+class BkgPart{
 
-        this.starsGeometry = new THREE.Geometry();
+  constructor(){
 
-        for ( var i = 0; i < 100000; i ++ ) {
+    this.starsGeometry = new THREE.Geometry();
 
-          var star = new THREE.Vector3();
-          star.x = THREE.Math.randFloatSpread( 2000 );
-          star.y = THREE.Math.randFloatSpread( 2000 );
-          star.z = THREE.Math.randFloatSpread( 2000 );
+    for ( var i = 0; i < 100000; i ++ ) {
 
-          this.starsGeometry.vertices.push( star );
+      var star = new THREE.Vector3();
+      star.x = THREE.Math.randFloatSpread( 2000 );
+      star.y = THREE.Math.randFloatSpread( 2000 );
+      star.z = THREE.Math.randFloatSpread( 2000 );
 
-        }
-        this.starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
-
-        this.starField = new THREE.Points( this.starsGeometry, this.starsMaterial );
-
-        scene.add(this.starField );
-
-      }
-
+      this.starsGeometry.vertices.push( star );
 
     }
+    this.starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
 
+    this.starField = new THREE.Points( this.starsGeometry, this.starsMaterial );
 
-    setup();
-    bkg = new BkgPart();
-
-    renderer.render( scene, camera );
-
-
-    function animate() {
-
-      flock.run();
-
-
-  var tempPos = flock.boids[0].mesh.position.clone();
-
-    //camera follow
-    camPos.add((tempPos.sub(camPos)).multiplyScalar(.5));
-    camera.position.set(camPos.x, camPos.y, camPos.z+60);
-    camera.lookAt( camPos );
-
-    //Spotlight follow
-    spotLight.position.set(camPos.x-30, camPos.y+40, camPos.z+0);
-    targetObject.position.set(camPos.x, camPos.y, camPos.z);
-
-    requestAnimationFrame( animate );
-    renderer.render( scene, camera );
-
-
+    scene.add(this.starField );
 
   }
 
 
-  animate();
+}
+
+
+setup();
+bkg = new BkgPart();
+
+renderer.render( scene, camera );
+
+
+function animate() {
+
+  flock.run();
+
+
+  var tempPos = flock.boids[0].mesh.position.clone();
+
+  //camera follow
+  camPos.add((tempPos.sub(camPos)).multiplyScalar(.5));
+  camera.position.set(camPos.x, camPos.y, camPos.z+60);
+  camera.lookAt( camPos );
+
+  //Spotlight follow
+  spotLight.position.set(camPos.x-30, camPos.y+40, camPos.z+0);
+  targetObject.position.set(camPos.x, camPos.y, camPos.z);
+
+  requestAnimationFrame( animate );
+  renderer.render( scene, camera );
+
+
+
+}
+
+
+animate();
